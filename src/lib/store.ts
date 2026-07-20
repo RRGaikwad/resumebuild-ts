@@ -76,9 +76,9 @@ export interface ResumeData {
 // Initial state - Populated with dummy data exactly matching the user's ATS Template image
 const initialState: ResumeData = {
   profile: {
-    name: "ROHAN GAIKWAD",
+    name: "JOHN DOE",
     title: "FULL STACK DEVELOPER",
-    email: "rohan.gaikwad@email.com",
+    email: "john.doe@email.com",
     phone: "+91 98765 43210",
     address: "Pune, Maharashtra, India",
     summary: "Motivated and detail-oriented Full Stack Developer with 2+ years of experience in designing, developing, and deploying scalable web applications. Proficient in modern JavaScript frameworks, backend technologies, and databases. Passionate about solving real-world problems and delivering clean, efficient, and user-friendly solutions.",
