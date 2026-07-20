@@ -1,6 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
-import { FiLayout, FiUser, FiBriefcase, FiBookOpen, FiAward, FiMessageSquare, FiCommand, FiCheckSquare, FiSearch, FiBell, FiGift } from "react-icons/fi";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FiLayout, FiUser, FiBriefcase, FiBookOpen, FiAward, FiMessageSquare, FiCommand, FiCheckSquare, FiSearch, FiBell, FiGift, FiLogOut } from "react-icons/fi";
 import { BottomNav } from "./BottomNav";
+import { useAuth } from "../../lib/AuthContext";
 import clsx from "clsx";
 
 interface AppShellProps {
@@ -9,6 +10,16 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/auth");
+  };
+
+  const userInitial = user?.displayName?.[0]?.toUpperCase() ?? user?.email?.[0]?.toUpperCase() ?? "U";
+  const userName = user?.displayName ?? user?.email?.split("@")[0] ?? "User";
 
   const buildLinks = [
     { path: "/templates", label: "Templates", icon: FiLayout },
@@ -72,14 +83,24 @@ export function AppShell({ children }: AppShellProps) {
             <p className="text-[13px] text-[#9CA3AF] mb-4 leading-tight">Unlock premium templates, AI tools, and more.</p>
             <button className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[15px] font-semibold py-2.5 rounded-[12px] transition-colors">Upgrade Now</button>
           </div>
-          <div className="flex items-center gap-3 px-2 py-2 cursor-pointer hover:bg-white/5 rounded-[16px] transition-colors">
-            <div className="w-10 h-10 rounded-full bg-slate-700 flex-shrink-0 overflow-hidden">
-              <img src="https://i.pravatar.cc/100?img=11" alt="User" className="w-full h-full object-cover" />
+          <div className="flex items-center gap-3 px-2 py-2 rounded-[16px] group">
+            <div className="w-10 h-10 rounded-full bg-[#2563EB] flex-shrink-0 overflow-hidden flex items-center justify-center">
+              {user?.photoURL
+                ? <img src={user.photoURL} alt={userName} className="w-full h-full object-cover" />
+                : <span className="text-white font-bold text-[15px]">{userInitial}</span>
+              }
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[15px] font-medium text-white truncate">Rohan Gaikwad</p>
+              <p className="text-[15px] font-medium text-white truncate">{userName}</p>
               <p className="text-[13px] text-[#9CA3AF] truncate">Free Plan</p>
             </div>
+            <button
+              onClick={handleLogout}
+              title="Sign out"
+              className="text-[#6B7280] hover:text-white transition-colors p-1.5 rounded-[8px] hover:bg-white/10"
+            >
+              <FiLogOut className="text-lg" />
+            </button>
           </div>
         </div>
       </aside>
@@ -105,8 +126,11 @@ export function AppShell({ children }: AppShellProps) {
               <FiBell className="text-xl" />
               <span className="absolute -top-1 -right-1 w-[18px] h-[18px] bg-[#EF4444] border-2 border-white rounded-full text-white text-[10px] font-bold flex items-center justify-center">2</span>
             </button>
-            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#E5E7EB] ml-2">
-              <img src="https://i.pravatar.cc/100?img=11" alt="User" className="w-full h-full object-cover" />
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#E5E7EB] ml-2 bg-[#2563EB] flex items-center justify-center">
+              {user?.photoURL
+                ? <img src={user.photoURL} alt={userName} className="w-full h-full object-cover" />
+                : <span className="text-white font-bold text-[14px]">{userInitial}</span>
+              }
             </div>
           </div>
         </header>
