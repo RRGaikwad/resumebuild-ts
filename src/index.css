@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  
+  --color-primary-500: #2563EB;
+  --color-primary-600: #1D4ED8;
+  
+  --color-success: #16A34A;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+
+  --color-bg-app: #F8FAFC;
+  --color-bg-sidebar: #0F172A;
+  --color-bg-card: #FFFFFF;
+
+  --color-border-subtle: #E5E7EB;
+  
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  
+  --animate-waving-hand: wave 2.5s infinite;
+  
+  @keyframes wave {
+    0% { transform: rotate(0.0deg) }
+    10% { transform: rotate(14.0deg) }
+    20% { transform: rotate(-8.0deg) }
+    30% { transform: rotate(14.0deg) }
+    40% { transform: rotate(-4.0deg) }
+    50% { transform: rotate(10.0deg) }
+    60% { transform: rotate(0.0deg) }
+    100% { transform: rotate(0.0deg) }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-[#F8FAFC] text-[#111827] font-sans antialiased text-[15px];
+    line-height: 1.6;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight text-[#111827];
+  }
+}
+
+@layer components {
+  .saas-card {
+    @apply bg-white rounded-[20px] p-[24px] border border-[#E5E7EB] shadow-[0_2px_8px_rgba(17,24,39,0.04)] transition-all duration-200;
+  }
+  
+  .saas-card-hover {
+    @apply hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(17,24,39,0.06)];
+  }
+
+  .premium-btn-primary {
+    @apply h-[44px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[15px] font-semibold rounded-[12px] px-6 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02];
+  }
+
+  .premium-btn-secondary {
+    @apply h-[44px] bg-white border border-[#E5E7EB] hover:border-[#2563EB] text-[#111827] text-[15px] font-semibold rounded-[12px] px-6 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02];
+  }
+}
+
+/* Hide scrollbar for clean app feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-700 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400 dark:bg-slate-600;
+}
