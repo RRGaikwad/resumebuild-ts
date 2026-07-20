@@ -9,7 +9,7 @@ import { AppShell } from "./components/Layout/AppShell";
 
 export default function App() {
   return (
-    <Router basename="/resumebuild-ts/">
+    <Router>
       <AppShell>
         <Routes>
           <Route path="/" element={<Dashboard />} />
