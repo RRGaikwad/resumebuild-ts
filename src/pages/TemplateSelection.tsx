@@ -5,10 +5,10 @@ import { TemplateCard } from "../components/TemplateCard";
 export function TemplateSelection() {
   const templates = [
     {
-      title: "New Template Coming Soon",
-      description: "A premium, print-friendly layout designed for the new system.",
+      title: "ATS Professional Template",
+      description: "A clean, minimalist layout engineered to pass applicant tracking systems with maximum accuracy.",
       image: "",
-      templateId: "new-modern",
+      templateId: "ats-professional",
     },
   ];
 

@@ -23,10 +23,7 @@ export function AppShell({ children }: AppShellProps) {
 
   const buildLinks = [
     { path: "/templates", label: "Templates", icon: FiLayout },
-    { path: "/form", label: "Personal Info", icon: FiUser },
-    { path: "#", label: "Experience", icon: FiBriefcase },
-    { path: "#", label: "Education", icon: FiBookOpen },
-    { path: "#", label: "Skills", icon: FiAward },
+    { path: "/form", label: "Resume Editor", icon: FiUser },
   ];
 
   const toolLinks = [

@@ -61,6 +61,7 @@
 - **Sidebar active state:** `bg-[#2563EB] text-white rounded-[16px]`.
 - **Sidebar inactive:** `text-white hover:bg-white/10 rounded-[16px]`.
 - **Section labels:** `text-[12px] uppercase tracking-[1px] text-[#6B7280]`.
+- **Navigation:** Unified single-flow form approach. Separate sidebar links for Personal Info, Experience, Education, and Skills have been removed. User navigates through `/templates` ➔ `/form` (Unified Editor) ➔ `/preview`.
 
 ### Dashboard (`/` route → `src/pages/Dashboard.tsx`)
 - Hero greeting (40px bold), subtitle (18px semibold muted).
@@ -68,13 +69,14 @@
 - 2-column grid below: left = My Resumes + Recommended Tools; right = Resume Strength + Recent Activity.
 - Resume rows are `h-[72px]` each inside `ResumeListItem.tsx`.
 
-### Routes
-| Path | Component |
-|---|---|
-| `/` | `Dashboard.tsx` |
-| `/templates` | `TemplateSelection.tsx` |
-| `/form` | `FormPage.tsx` |
-| `/preview` | `PreviewPage.tsx` |
+### Routes & Flow
+| Path | Component | Purpose |
+|---|---|---|
+| `/auth` | `AuthPage.tsx` | Premium auth screen with Google + Email options |
+| `/` | `Dashboard.tsx` | Main hub with stats, recent resumes, and live Firebase sync |
+| `/templates` | `TemplateSelection.tsx` | Entry point for creation. Shows available templates (e.g., ATS Professional) |
+| `/form` | `FormPage.tsx` | Unified multi-step editor. Replaces separate sidebar routing. |
+| `/preview` | `PreviewPage.tsx` | Final review and export functionality |
 
 ## Workflow Rules
 - Any changes to `index.html` or `vite.config.ts` must maintain PWA compatibility.
