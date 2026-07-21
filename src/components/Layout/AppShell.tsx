@@ -17,6 +17,8 @@ export function AppShell({ children }: AppShellProps) {
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [installPromptEvent, setInstallPromptEvent] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: any) => {
@@ -133,13 +135,33 @@ export function AppShell({ children }: AppShellProps) {
         {/* Top Header */}
         <header className="h-[72px] bg-white border-b border-[#E5E7EB] flex items-center px-4 md:px-8 z-10 shrink-0">
           <div className="flex-1 flex justify-center hidden md:flex">
-            <div className="relative w-full max-w-[750px]">
+            <div className="relative w-full max-w-[750px] z-50">
               <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280] text-lg" />
-              <input type="text" placeholder="Search anything..." className="w-full bg-[#F8FAFC] border border-[#E5E7EB] rounded-[16px] pl-12 pr-4 h-[44px] text-[15px] placeholder-[#9CA3AF] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-all" />
+              <input 
+                type="text" 
+                placeholder="Search templates, resumes, or tools..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setIsSearchFocused(true)}
+                className="w-full bg-[#F8FAFC] border border-[#E5E7EB] rounded-[16px] pl-12 pr-4 h-[44px] text-[15px] placeholder-[#9CA3AF] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-all" 
+              />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[#9CA3AF] text-xs font-medium">
                 <span className="bg-white border border-[#E5E7EB] rounded px-1.5 py-0.5">⌘</span>
                 <span className="bg-white border border-[#E5E7EB] rounded px-1.5 py-0.5">K</span>
               </div>
+
+              {isSearchFocused && searchQuery && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsSearchFocused(false)} />
+                  <div className="absolute top-full mt-2 w-full bg-white border border-[#E5E7EB] rounded-[16px] shadow-lg z-50 overflow-hidden">
+                    <div className="p-2">
+                      <p className="px-3 py-2 text-xs font-semibold text-[#9CA3AF] uppercase">Navigation</p>
+                      <button onClick={() => { navigate("/templates"); setIsSearchFocused(false); setSearchQuery(""); }} className="w-full text-left px-3 py-2 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 rounded-lg">Browse Templates</button>
+                      <button onClick={() => { navigate("/form"); setIsSearchFocused(false); setSearchQuery(""); }} className="w-full text-left px-3 py-2 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 rounded-lg">Resume Editor</button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           

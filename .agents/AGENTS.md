@@ -61,7 +61,7 @@
 - **Sidebar active state:** `bg-[#2563EB] text-white rounded-[16px]`.
 - **Sidebar inactive:** `text-white hover:bg-white/10 rounded-[16px]`.
 - **Section labels:** `text-[12px] uppercase tracking-[1px] text-[#6B7280]`.
-- **Header:** Contains dynamic PWA "Install App" button (via `beforeinstallprompt`), interactive Notifications dropdown, and a clickable user avatar that opens `AccountModal`.
+- **Header:** Contains dynamic PWA "Install App" button (via `beforeinstallprompt`), interactive Notifications dropdown, functional Global Search with dropdown overlay, and a clickable user avatar that opens `AccountModal`.
 - **Navigation:** Unified single-flow form approach. Separate sidebar links for Personal Info, Experience, Education, and Skills have been removed. User navigates through `/templates` ➔ `/form` (Unified Editor) ➔ `/preview`.
 
 ### Dashboard (`/` route → `src/pages/Dashboard.tsx`)
@@ -77,7 +77,7 @@
 | `/` | `Dashboard.tsx` | Main hub with stats, recent resumes, and live Firebase sync |
 | `/templates` | `TemplateSelection.tsx` | Entry point for creation. Shows available templates (e.g., ATS Professional) |
 | `/form` | `FormPage.tsx` | Unified multi-step editor. Replaces separate sidebar routing. |
-| `/preview` | `PreviewPage.tsx` | Final review and export functionality |
+| `/preview` | `PreviewPage.tsx` | Final review and export functionality (handles html2canvas/jsPDF directly without modals to prevent rendering bugs) |
 
 ## Workflow Rules
 - Any changes to `index.html` or `vite.config.ts` must maintain PWA compatibility.
