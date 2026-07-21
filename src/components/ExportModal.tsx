@@ -14,7 +14,7 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
   const { template } = useResumeStore();
 
   const handleDownloadJPG = async () => {
-    const resume = document.querySelector(".max-w-4xl.mx-auto") as HTMLElement;
+    const resume = document.querySelector("#resume-preview-container") as HTMLElement;
     if (!resume) return;
 
     const canvas = await html2canvas(resume);
@@ -25,7 +25,7 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
   };
 
   const handleDownloadPDF = async () => {
-    const resume = document.querySelector(".max-w-4xl.mx-auto") as HTMLElement;
+    const resume = document.querySelector("#resume-preview-container") as HTMLElement;
     if (!resume) return;
 
     const canvas = await html2canvas(resume);

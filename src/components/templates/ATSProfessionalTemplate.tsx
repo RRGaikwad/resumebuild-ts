@@ -13,7 +13,7 @@ export function ATSProfessionalTemplate() {
   };
 
   return (
-    <div className="bg-white w-full max-w-[850px] mx-auto min-h-[1100px] shadow-sm text-black p-8 sm:p-12 font-sans" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+    <div id="resume-preview-container" className="bg-white w-full max-w-[850px] mx-auto min-h-[1100px] shadow-sm text-black p-8 sm:p-12 font-sans" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
       
       {/* HEADER */}
       <header className="mb-6">

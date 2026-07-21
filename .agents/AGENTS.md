@@ -61,6 +61,7 @@
 - **Sidebar active state:** `bg-[#2563EB] text-white rounded-[16px]`.
 - **Sidebar inactive:** `text-white hover:bg-white/10 rounded-[16px]`.
 - **Section labels:** `text-[12px] uppercase tracking-[1px] text-[#6B7280]`.
+- **Header:** Contains dynamic PWA "Install App" button (via `beforeinstallprompt`), interactive Notifications dropdown, and a clickable user avatar that opens `AccountModal`.
 - **Navigation:** Unified single-flow form approach. Separate sidebar links for Personal Info, Experience, Education, and Skills have been removed. User navigates through `/templates` ➔ `/form` (Unified Editor) ➔ `/preview`.
 
 ### Dashboard (`/` route → `src/pages/Dashboard.tsx`)

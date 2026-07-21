@@ -1,7 +1,9 @@
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FiLayout, FiUser, FiBriefcase, FiBookOpen, FiAward, FiMessageSquare, FiCommand, FiCheckSquare, FiSearch, FiBell, FiGift, FiLogOut } from "react-icons/fi";
+import { FiLayout, FiUser, FiBriefcase, FiBookOpen, FiAward, FiMessageSquare, FiCommand, FiCheckSquare, FiSearch, FiBell, FiGift, FiLogOut, FiDownload } from "react-icons/fi";
 import { BottomNav } from "./BottomNav";
 import { useAuth } from "../../lib/AuthContext";
+import { AccountModal } from "../AccountModal";
 import clsx from "clsx";
 
 interface AppShellProps {
@@ -12,6 +14,27 @@ export function AppShell({ children }: AppShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [installPromptEvent, setInstallPromptEvent] = useState<any>(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setInstallPromptEvent(e);
+    };
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!installPromptEvent) return;
+    installPromptEvent.prompt();
+    const { outcome } = await installPromptEvent.userChoice;
+    if (outcome === "accepted") {
+      setInstallPromptEvent(null);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -80,7 +103,10 @@ export function AppShell({ children }: AppShellProps) {
             <p className="text-[13px] text-[#9CA3AF] mb-4 leading-tight">Unlock premium templates, AI tools, and more.</p>
             <button className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[15px] font-semibold py-2.5 rounded-[12px] transition-colors">Upgrade Now</button>
           </div>
-          <div className="flex items-center gap-3 px-2 py-2 rounded-[16px] group">
+          <div 
+            onClick={() => setIsAccountModalOpen(true)}
+            className="flex items-center gap-3 px-2 py-2 rounded-[16px] group cursor-pointer hover:bg-white/5 transition-colors"
+          >
             <div className="w-10 h-10 rounded-full bg-[#2563EB] flex-shrink-0 overflow-hidden flex items-center justify-center">
               {user?.photoURL
                 ? <img src={user.photoURL} alt={userName} className="w-full h-full object-cover" />
@@ -92,7 +118,7 @@ export function AppShell({ children }: AppShellProps) {
               <p className="text-[13px] text-[#9CA3AF] truncate">Free Plan</p>
             </div>
             <button
-              onClick={handleLogout}
+              onClick={(e) => { e.stopPropagation(); handleLogout(); }}
               title="Sign out"
               className="text-[#6B7280] hover:text-white transition-colors p-1.5 rounded-[8px] hover:bg-white/10"
             >
@@ -118,12 +144,54 @@ export function AppShell({ children }: AppShellProps) {
           </div>
           
           <div className="flex items-center gap-5 ml-auto">
-            <button className="text-[#6B7280] hover:text-[#111827] transition-colors"><FiGift className="text-xl" /></button>
-            <button className="text-[#6B7280] hover:text-[#111827] transition-colors relative">
-              <FiBell className="text-xl" />
-              <span className="absolute -top-1 -right-1 w-[18px] h-[18px] bg-[#EF4444] border-2 border-white rounded-full text-white text-[10px] font-bold flex items-center justify-center">2</span>
-            </button>
-            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#E5E7EB] ml-2 bg-[#2563EB] flex items-center justify-center">
+            {installPromptEvent && (
+              <button 
+                onClick={handleInstallClick}
+                className="hidden md:flex items-center gap-2 bg-[#F8FAFC] border border-[#E5E7EB] hover:border-[#2563EB] text-[#2563EB] text-[13px] font-semibold px-3 py-1.5 rounded-[8px] transition-colors"
+              >
+                <FiDownload className="text-sm" />
+                Install App
+              </button>
+            )}
+
+            {/* Notifications */}
+            <div className="relative">
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="text-[#6B7280] hover:text-[#111827] transition-colors relative"
+              >
+                <FiBell className="text-xl" />
+                <span className="absolute -top-1 -right-1 w-[18px] h-[18px] bg-[#EF4444] border-2 border-white rounded-full text-white text-[10px] font-bold flex items-center justify-center">1</span>
+              </button>
+
+              {showNotifications && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
+                  <div className="absolute right-0 top-full mt-3 w-[320px] bg-white border border-[#E5E7EB] rounded-[16px] shadow-[0_8px_30px_rgba(0,0,0,0.12)] z-50 overflow-hidden animate-in slide-in-from-top-2 duration-200">
+                    <div className="p-4 border-b border-[#E5E7EB] flex items-center justify-between">
+                      <h3 className="font-bold text-[#111827]">Notifications</h3>
+                      <button className="text-[12px] font-semibold text-[#2563EB] hover:text-[#1D4ED8]">Mark all read</button>
+                    </div>
+                    <div className="p-2 max-h-[300px] overflow-y-auto">
+                      <div className="p-3 hover:bg-[#F8FAFC] rounded-[8px] transition-colors cursor-pointer flex gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#eff6ff] flex items-center justify-center shrink-0">
+                          <span className="text-xl">👋</span>
+                        </div>
+                        <div>
+                          <p className="text-[14px] font-medium text-[#111827]">Welcome to ResumeBuilder!</p>
+                          <p className="text-[12px] text-[#6B7280] mt-0.5">Let's create your first resume.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div 
+              onClick={() => setIsAccountModalOpen(true)}
+              className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#E5E7EB] ml-2 bg-[#2563EB] flex items-center justify-center cursor-pointer hover:border-[#2563EB] transition-colors"
+            >
               {user?.photoURL
                 ? <img src={user.photoURL} alt={userName} className="w-full h-full object-cover" />
                 : <span className="text-white font-bold text-[14px]">{userInitial}</span>
@@ -142,6 +210,9 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* Mobile Bottom Navigation */}
       <BottomNav />
+      
+      {/* Modals */}
+      <AccountModal isOpen={isAccountModalOpen} onClose={() => setIsAccountModalOpen(false)} />
     </div>
   );
 }
