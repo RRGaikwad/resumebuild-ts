@@ -7,7 +7,7 @@ export function TemplateSelection() {
     {
       title: "ATS Professional Template",
       description: "A clean, minimalist layout engineered to pass applicant tracking systems with maximum accuracy.",
-      image: "",
+      image: "/ats-template-thumbnail.jpg",
       templateId: "ats-professional",
     },
   ];
