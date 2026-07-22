@@ -91,11 +91,16 @@
 - **Export Functionality (PDF & JPG) — Root Cause Fix**: The original `html2canvas` exports failed silently because:
   1. `ATSProfessionalTemplate.tsx` used **`react-icons` SVG components** (`FiMail`, `FiPhone`, etc.) — `html2canvas` cannot render SVG elements and silently skips them, corrupting the canvas.
   2. The Google Fonts `@import` in `index.css` is loaded externally — `html2canvas` cannot resolve external fonts.
+  3. **PDF scaling mismatch (secondary bug):** The PDF was created with a fixed `format: "a4"` and `unit: "mm"`, forcing the canvas image into A4 dimensions. This caused aspect ratio distortion and multi-page slicing errors — the PDF looked different from the JPG.
   - **Fix applied to `ATSProfessionalTemplate.tsx`**: Removed all `react-icons` imports. Replaced with plain **Unicode text characters** (✉, ✆, ⊙, etc.) and converted all styles to **inline `style={{}}` props** (no Tailwind classes) so `html2canvas` can read them directly.
-  - **Fix applied to `PreviewPage.tsx`**: The element is **cloned offscreen** into a fixed wrapper appended to `document.body` before capture, ensuring no scroll clipping or layout instability affects the canvas. The download link is also explicitly appended/removed from `document.body` to guarantee the browser triggers the download. Multi-page PDF support added — resumes taller than A4 are sliced into multiple pages automatically.
+  - **Fix applied to `PreviewPage.tsx`**: 
+    - The element is **cloned offscreen** into a fixed wrapper appended to `document.body` before capture, ensuring no scroll clipping or layout instability affects the canvas.
+    - The download link is explicitly appended/removed from `document.body` to guarantee the browser triggers the download.
+    - **PDF now uses `unit: "px"` with a custom `format: [cssWidth, cssHeight]`** matching exactly the canvas dimensions (divided by scale factor 2). This makes the PDF page identical to the JPG — no scaling, no slicing, no distortion.
 
 ## Architecture Rules (Anti-Regression)
 - **NEVER use `react-icons` SVG components inside any resume template** — they break `html2canvas` export. Use Unicode characters or text only.
 - **NEVER use Tailwind CSS classes for layout inside resume templates** — use `style={{}}` inline styles so `html2canvas` can read computed values.
+- **NEVER use `format: "a4"` with `unit: "mm"` for PDF export** — this forces a fixed page size that distorts the resume. Always use `unit: "px"` with `format: [canvas.width/2, canvas.height/2]` so the PDF page matches the canvas exactly (identical to JPG output).
 - **Always test PDF + JPG export after any changes to a template component.**
 

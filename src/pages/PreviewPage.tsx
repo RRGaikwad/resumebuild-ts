@@ -80,42 +80,21 @@ export function PreviewPage() {
       const canvas = await captureResumeCanvas();
       const imgData = canvas.toDataURL("image/jpeg", 0.95);
 
+      // KEY FIX: Use unit:"px" and match page dimensions to the canvas size
+      // (divided by scale factor 2). This means the PDF page IS the resume —
+      // no forced A4 scaling, no multi-page slicing, identical output to JPG.
+      // The canvas is rendered at scale:2 so CSS pixel dimensions = canvas / 2.
+      const cssWidth = canvas.width / 2;
+      const cssHeight = canvas.height / 2;
+
       const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
+        orientation: cssHeight >= cssWidth ? "portrait" : "landscape",
+        unit: "px",
+        format: [cssWidth, cssHeight],
+        hotfixes: ["px_scaling"],
       });
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      // If the resume is taller than A4, add multiple pages
-      const pageHeightMm = pdf.internal.pageSize.getHeight();
-      if (pdfHeight <= pageHeightMm) {
-        pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
-      } else {
-        // Multi-page: slice canvas into A4-height chunks
-        const pageHeightPx = Math.floor((pageHeightMm * canvas.width) / pdfWidth);
-        let offsetY = 0;
-        while (offsetY < canvas.height) {
-          const sliceHeight = Math.min(pageHeightPx, canvas.height - offsetY);
-          const pageCanvas = document.createElement("canvas");
-          pageCanvas.width = canvas.width;
-          pageCanvas.height = sliceHeight;
-          const ctx = pageCanvas.getContext("2d");
-          if (ctx) {
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-            ctx.drawImage(canvas, 0, -offsetY);
-          }
-          const pageImgData = pageCanvas.toDataURL("image/jpeg", 0.95);
-          const thisPageHeightMm = (sliceHeight * pdfWidth) / canvas.width;
-          if (offsetY > 0) pdf.addPage();
-          pdf.addImage(pageImgData, "JPEG", 0, 0, pdfWidth, thisPageHeightMm);
-          offsetY += pageHeightPx;
-        }
-      }
-
+      pdf.addImage(imgData, "JPEG", 0, 0, cssWidth, cssHeight);
       pdf.save(`resume-${template || "download"}.pdf`);
     } catch (error) {
       console.error("PDF Export failed:", error);
