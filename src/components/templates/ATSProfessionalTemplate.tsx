@@ -1,6 +1,9 @@
 import React from "react";
 import { useResumeStore } from "../../lib/store";
-import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe, FiLink } from "react-icons/fi";
+
+// NOTE: All icons are plain Unicode/text characters intentionally.
+// react-icons SVGs are NOT used here because html2canvas cannot render
+// SVG elements, causing PDF/JPG export to silently fail or produce a blank output.
 
 export function ATSProfessionalTemplate() {
   const data = useResumeStore();
@@ -8,203 +11,213 @@ export function ATSProfessionalTemplate() {
   const renderBullets = (text: string) => {
     if (!text) return null;
     return text.split('\n').map((bullet, idx) => (
-      <li key={idx} className="mb-1 leading-snug">{bullet.trim()}</li>
+      <li key={idx} style={{ marginBottom: '2px', lineHeight: '1.4' }}>{bullet.trim()}</li>
     ));
   };
 
   return (
-    <div id="resume-preview-container" className="bg-white w-full max-w-[850px] mx-auto min-h-[1100px] shadow-sm text-black p-8 sm:p-12 font-sans" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-      
+    <div
+      id="resume-preview-container"
+      style={{
+        backgroundColor: '#ffffff',
+        width: '850px',
+        minHeight: '1100px',
+        margin: '0 auto',
+        padding: '48px',
+        fontFamily: 'Arial, Helvetica, sans-serif',
+        color: '#000000',
+        boxSizing: 'border-box',
+        fontSize: '13px',
+        lineHeight: '1.5',
+      }}
+    >
+
       {/* HEADER */}
-      <header className="mb-6">
-        <h1 className="text-4xl font-extrabold uppercase tracking-tight mb-1">{data.profile.name}</h1>
-        <h2 className="text-sm font-bold uppercase tracking-wider mb-3">{data.profile.title}</h2>
-        
-        <div className="flex flex-wrap items-center text-xs gap-x-2 gap-y-1">
+      <div style={{ marginBottom: '20px' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '-0.5px', marginBottom: '2px', margin: '0 0 2px 0' }}>
+          {data.profile.name}
+        </h1>
+        <h2 style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', margin: '0 0 10px 0', color: '#444' }}>
+          {data.profile.title}
+        </h2>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', fontSize: '12px', gap: '6px' }}>
           {data.profile.email && (
-            <div className="flex items-center gap-1">
-              <FiMail /> <span>{data.profile.email}</span>
-            </div>
+            <span>✉ {data.profile.email}</span>
           )}
-          
-          {(data.profile.phone || data.profile.address || data.profile.socialLinks?.linkedin) && data.profile.email && <span className="text-gray-300">|</span>}
-          
+          {data.profile.phone && data.profile.email && <span style={{ color: '#aaa' }}>|</span>}
           {data.profile.phone && (
-            <div className="flex items-center gap-1">
-              <FiPhone /> <span>{data.profile.phone}</span>
-            </div>
+            <span>✆ {data.profile.phone}</span>
           )}
-          
-          {(data.profile.address || data.profile.socialLinks?.linkedin) && data.profile.phone && <span className="text-gray-300">|</span>}
-          
+          {data.profile.address && data.profile.phone && <span style={{ color: '#aaa' }}>|</span>}
           {data.profile.address && (
-            <div className="flex items-center gap-1">
-              <FiMapPin /> <span>{data.profile.address}</span>
-            </div>
+            <span>⊙ {data.profile.address}</span>
           )}
-          
-          {data.profile.socialLinks?.linkedin && data.profile.address && <span className="text-gray-300">|</span>}
-          
+          {data.profile.socialLinks?.linkedin && data.profile.address && <span style={{ color: '#aaa' }}>|</span>}
           {data.profile.socialLinks?.linkedin && (
-            <div className="flex items-center gap-1">
-              <FiLinkedin /> <span>{data.profile.socialLinks.linkedin}</span>
-            </div>
+            <span>in {data.profile.socialLinks.linkedin}</span>
           )}
-          
-          {data.profile.socialLinks?.github && data.profile.socialLinks?.linkedin && <span className="text-gray-300">|</span>}
-          
+          {data.profile.socialLinks?.github && data.profile.socialLinks?.linkedin && <span style={{ color: '#aaa' }}>|</span>}
           {data.profile.socialLinks?.github && (
-            <div className="flex items-center gap-1">
-              <FiGithub /> <span>{data.profile.socialLinks.github}</span>
-            </div>
+            <span>GH {data.profile.socialLinks.github}</span>
           )}
-          
-          {data.profile.socialLinks?.website && data.profile.socialLinks?.github && <span className="text-gray-300">|</span>}
-          
+          {data.profile.socialLinks?.website && data.profile.socialLinks?.github && <span style={{ color: '#aaa' }}>|</span>}
           {data.profile.socialLinks?.website && (
-            <div className="flex items-center gap-1">
-              <FiGlobe /> <span>{data.profile.socialLinks.website}</span>
-            </div>
+            <span>⊕ {data.profile.socialLinks.website}</span>
           )}
         </div>
-      </header>
+      </div>
 
       {/* PROFESSIONAL SUMMARY */}
       {data.profile.summary && (
-        <section className="mb-6">
-          <h3 className="text-[13px] font-bold uppercase border-b border-black pb-1 mb-2">Professional Summary</h3>
-          <p className="text-[13px] leading-relaxed text-justify">
+        <div style={{ marginBottom: '18px' }}>
+          <h3 style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', borderBottom: '1.5px solid #000', paddingBottom: '3px', marginBottom: '6px', letterSpacing: '0.5px' }}>
+            Professional Summary
+          </h3>
+          <p style={{ fontSize: '13px', lineHeight: '1.6', textAlign: 'justify', margin: 0 }}>
             {data.profile.summary}
           </p>
-        </section>
+        </div>
       )}
 
       {/* EXPERIENCE */}
       {data.experience.length > 0 && (
-        <section className="mb-6">
-          <h3 className="text-[13px] font-bold uppercase border-b border-black pb-1 mb-3">Experience</h3>
-          <div className="flex flex-col gap-4">
+        <div style={{ marginBottom: '18px' }}>
+          <h3 style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', borderBottom: '1.5px solid #000', paddingBottom: '3px', marginBottom: '8px', letterSpacing: '0.5px' }}>
+            Experience
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {data.experience.map((exp, idx) => (
               <div key={idx}>
-                <div className="flex justify-between items-baseline mb-0.5">
-                  <h4 className="text-[13px] font-bold">{exp.jobTitle}</h4>
-                  <span className="text-[12px]">{exp.startDate} – {exp.endDate}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '1px' }}>
+                  <h4 style={{ fontSize: '13px', fontWeight: '700', margin: 0 }}>{exp.jobTitle}</h4>
+                  <span style={{ fontSize: '12px' }}>{exp.startDate} – {exp.endDate}</span>
                 </div>
-                <div className="flex justify-between items-baseline mb-2">
-                  <span className="text-[13px]">{exp.company}</span>
-                  <span className="text-[12px]">{exp.location}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '13px' }}>{exp.company}</span>
+                  <span style={{ fontSize: '12px' }}>{exp.location}</span>
                 </div>
-                <ul className="list-disc list-inside text-[12px] pl-1">
+                <ul style={{ listStyleType: 'disc', paddingLeft: '16px', margin: 0, fontSize: '12px' }}>
                   {renderBullets(exp.description)}
                 </ul>
               </div>
             ))}
           </div>
-        </section>
+        </div>
       )}
 
       {/* PROJECTS */}
       {data.projects && data.projects.length > 0 && (
-        <section className="mb-6">
-          <h3 className="text-[13px] font-bold uppercase border-b border-black pb-1 mb-3">Projects</h3>
-          <div className="flex flex-col gap-3">
+        <div style={{ marginBottom: '18px' }}>
+          <h3 style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', borderBottom: '1.5px solid #000', paddingBottom: '3px', marginBottom: '8px', letterSpacing: '0.5px' }}>
+            Projects
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {data.projects.map((proj, idx) => (
               <div key={idx}>
-                <div className="flex justify-between items-baseline mb-1">
-                  <div className="text-[13px]">
-                    <span className="font-bold">{proj.name}</span>
-                    <span className="mx-2 text-gray-300">|</span>
-                    <span className="italic">{proj.techStack}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2px' }}>
+                  <div style={{ fontSize: '13px' }}>
+                    <span style={{ fontWeight: '700' }}>{proj.name}</span>
+                    {proj.techStack && <span style={{ color: '#555', margin: '0 6px' }}>|</span>}
+                    {proj.techStack && <span style={{ fontStyle: 'italic' }}>{proj.techStack}</span>}
                   </div>
                   {proj.link && (
-                    <div className="flex items-center gap-1 text-[12px]">
-                      <FiLink className="text-[10px]"/> <span>{proj.link}</span>
-                    </div>
+                    <span style={{ fontSize: '12px' }}>⊕ {proj.link}</span>
                   )}
                 </div>
-                <p className="text-[12px] leading-snug">{proj.description}</p>
+                <p style={{ fontSize: '12px', lineHeight: '1.4', margin: 0 }}>{proj.description}</p>
               </div>
             ))}
           </div>
-        </section>
+        </div>
       )}
 
       {/* EDUCATION */}
       {data.education.length > 0 && (
-        <section className="mb-6">
-          <h3 className="text-[13px] font-bold uppercase border-b border-black pb-1 mb-3">Education</h3>
-          <div className="flex flex-col gap-3">
+        <div style={{ marginBottom: '18px' }}>
+          <h3 style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', borderBottom: '1.5px solid #000', paddingBottom: '3px', marginBottom: '8px', letterSpacing: '0.5px' }}>
+            Education
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {data.education.map((edu, idx) => (
               <div key={idx}>
-                <div className="flex justify-between items-baseline mb-0.5">
-                  <h4 className="text-[13px] font-bold">{edu.degree}</h4>
-                  <span className="text-[12px]">{edu.startDate} – {edu.endDate}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '1px' }}>
+                  <h4 style={{ fontSize: '13px', fontWeight: '700', margin: 0 }}>{edu.degree}</h4>
+                  <span style={{ fontSize: '12px' }}>{edu.startDate} – {edu.endDate}</span>
                 </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-[13px]">{edu.institution}</span>
-                  {edu.score && <span className="text-[12px]">{edu.score}</span>}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <span style={{ fontSize: '13px' }}>{edu.institution}</span>
+                  {edu.score && <span style={{ fontSize: '12px' }}>{edu.score}</span>}
                 </div>
               </div>
             ))}
           </div>
-        </section>
+        </div>
       )}
 
       {/* SKILLS */}
       {data.categorizedSkills && data.categorizedSkills.length > 0 && (
-        <section className="mb-6">
-          <h3 className="text-[13px] font-bold uppercase border-b border-black pb-1 mb-3">Skills</h3>
-          <div className="flex flex-col gap-1 text-[13px]">
+        <div style={{ marginBottom: '18px' }}>
+          <h3 style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', borderBottom: '1.5px solid #000', paddingBottom: '3px', marginBottom: '8px', letterSpacing: '0.5px' }}>
+            Skills
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '13px' }}>
             {data.categorizedSkills.map((skill, idx) => (
-              <div key={idx} className="flex">
-                <span className="font-bold w-[130px] flex-shrink-0">{skill.category}:</span>
+              <div key={idx} style={{ display: 'flex' }}>
+                <span style={{ fontWeight: '700', width: '130px', flexShrink: 0 }}>{skill.category}:</span>
                 <span>{skill.items}</span>
               </div>
             ))}
           </div>
-        </section>
+        </div>
       )}
 
       {/* CERTIFICATIONS */}
       {data.certifications && data.certifications.length > 0 && (
-        <section className="mb-6">
-          <h3 className="text-[13px] font-bold uppercase border-b border-black pb-1 mb-3">Certifications</h3>
-          <ul className="list-disc list-inside text-[13px] pl-1 space-y-1">
+        <div style={{ marginBottom: '18px' }}>
+          <h3 style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', borderBottom: '1.5px solid #000', paddingBottom: '3px', marginBottom: '8px', letterSpacing: '0.5px' }}>
+            Certifications
+          </h3>
+          <ul style={{ listStyleType: 'disc', paddingLeft: '16px', margin: 0, fontSize: '13px' }}>
             {data.certifications.map((cert, idx) => (
-              <li key={idx}>{cert}</li>
+              <li key={idx} style={{ marginBottom: '2px' }}>{cert}</li>
             ))}
           </ul>
-        </section>
+        </div>
       )}
 
       {/* ACHIEVEMENTS */}
       {data.achievements && data.achievements.length > 0 && (
-        <section className="mb-6">
-          <h3 className="text-[13px] font-bold uppercase border-b border-black pb-1 mb-3">Achievements</h3>
-          <ul className="list-disc list-inside text-[13px] pl-1 space-y-1">
+        <div style={{ marginBottom: '18px' }}>
+          <h3 style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', borderBottom: '1.5px solid #000', paddingBottom: '3px', marginBottom: '8px', letterSpacing: '0.5px' }}>
+            Achievements
+          </h3>
+          <ul style={{ listStyleType: 'disc', paddingLeft: '16px', margin: 0, fontSize: '13px' }}>
             {data.achievements.map((ach, idx) => (
-              <li key={idx}>{ach}</li>
+              <li key={idx} style={{ marginBottom: '2px' }}>{ach}</li>
             ))}
           </ul>
-        </section>
+        </div>
       )}
 
       {/* LANGUAGES */}
       {data.languages && data.languages.length > 0 && (
-        <section>
-          <h3 className="text-[13px] font-bold uppercase border-b border-black pb-1 mb-3">Languages</h3>
-          <div className="flex flex-wrap items-center text-[13px] gap-x-4 gap-y-2">
+        <div>
+          <h3 style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', borderBottom: '1.5px solid #000', paddingBottom: '3px', marginBottom: '8px', letterSpacing: '0.5px' }}>
+            Languages
+          </h3>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', fontSize: '13px', gap: '12px' }}>
             {data.languages.map((lang, idx) => (
               <React.Fragment key={idx}>
                 <div>
-                  <span className="font-bold">{lang.name}</span>
+                  <span style={{ fontWeight: '700' }}>{lang.name}</span>
                   {lang.proficiency && <span> – {lang.proficiency}</span>}
                 </div>
-                {idx < data.languages.length - 1 && <span className="text-gray-300">|</span>}
+                {idx < data.languages.length - 1 && <span style={{ color: '#ccc' }}>|</span>}
               </React.Fragment>
             ))}
           </div>
-        </section>
+        </div>
       )}
 
     </div>

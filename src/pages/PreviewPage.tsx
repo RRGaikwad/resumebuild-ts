@@ -8,30 +8,65 @@ import { ATSProfessionalTemplate } from "../components/templates/ATSProfessional
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
+// ─── Export helpers ────────────────────────────────────────────────────────────
+// Root cause of previous failures: html2canvas cannot render SVG elements
+// (react-icons) and cannot resolve external fonts (@import Google Fonts).
+// Fix: ATSProfessionalTemplate uses only inline styles + Unicode chars (no SVGs).
+// We also clone the element offscreen so its layout is stable during capture.
+
+async function captureResumeCanvas(): Promise<HTMLCanvasElement> {
+  const source = document.querySelector("#resume-preview-container") as HTMLElement;
+  if (!source) throw new Error("Resume container not found");
+
+  // Clone into a fixed offscreen container so scrolling / clipping don't cut it off
+  const wrapper = document.createElement("div");
+  wrapper.style.cssText =
+    "position:fixed;top:0;left:-9999px;z-index:-1;pointer-events:none;";
+  const clone = source.cloneNode(true) as HTMLElement;
+  // Ensure the clone has the explicit pixel width so html2canvas sees full width
+  clone.style.width = source.offsetWidth + "px";
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+
+  try {
+    const canvas = await html2canvas(clone, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: "#ffffff",
+      logging: false,
+      width: source.offsetWidth,
+      height: source.scrollHeight,
+      windowWidth: source.offsetWidth,
+    });
+    return canvas;
+  } finally {
+    document.body.removeChild(wrapper);
+  }
+}
+
 export function PreviewPage() {
   const { template } = useResumeStore();
   const navigate = useNavigate();
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const handleDownloadJPG = async () => {
     setIsExporting(true);
     setIsExportDropdownOpen(false);
+    setExportError(null);
     try {
-      const resume = document.querySelector("#resume-preview-container") as HTMLElement;
-      if (!resume) throw new Error("Resume container not found");
-      
-      const canvas = await html2canvas(resume, { 
-        scale: 2,
-        useCORS: true,
-        allowTaint: true
-      });
+      const canvas = await captureResumeCanvas();
       const link = document.createElement("a");
-      link.download = `resume-${template}.jpg`;
-      link.href = canvas.toDataURL("image/jpeg");
+      link.download = `resume-${template || "download"}.jpg`;
+      link.href = canvas.toDataURL("image/jpeg", 0.95);
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     } catch (error) {
-      console.error("Export failed", error);
+      console.error("JPG Export failed:", error);
+      setExportError("Export failed. Please try again.");
     } finally {
       setIsExporting(false);
     }
@@ -40,29 +75,51 @@ export function PreviewPage() {
   const handleDownloadPDF = async () => {
     setIsExporting(true);
     setIsExportDropdownOpen(false);
+    setExportError(null);
     try {
-      const resume = document.querySelector("#resume-preview-container") as HTMLElement;
-      if (!resume) throw new Error("Resume container not found");
+      const canvas = await captureResumeCanvas();
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
 
-      const canvas = await html2canvas(resume, { 
-        scale: 2,
-        useCORS: true,
-        allowTaint: true
-      });
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
         format: "a4",
       });
-      const imgData = canvas.toDataURL("image/jpeg");
-      
+
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`resume-${template}.pdf`);
+
+      // If the resume is taller than A4, add multiple pages
+      const pageHeightMm = pdf.internal.pageSize.getHeight();
+      if (pdfHeight <= pageHeightMm) {
+        pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+      } else {
+        // Multi-page: slice canvas into A4-height chunks
+        const pageHeightPx = Math.floor((pageHeightMm * canvas.width) / pdfWidth);
+        let offsetY = 0;
+        while (offsetY < canvas.height) {
+          const sliceHeight = Math.min(pageHeightPx, canvas.height - offsetY);
+          const pageCanvas = document.createElement("canvas");
+          pageCanvas.width = canvas.width;
+          pageCanvas.height = sliceHeight;
+          const ctx = pageCanvas.getContext("2d");
+          if (ctx) {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+            ctx.drawImage(canvas, 0, -offsetY);
+          }
+          const pageImgData = pageCanvas.toDataURL("image/jpeg", 0.95);
+          const thisPageHeightMm = (sliceHeight * pdfWidth) / canvas.width;
+          if (offsetY > 0) pdf.addPage();
+          pdf.addImage(pageImgData, "JPEG", 0, 0, pdfWidth, thisPageHeightMm);
+          offsetY += pageHeightPx;
+        }
+      }
+
+      pdf.save(`resume-${template || "download"}.pdf`);
     } catch (error) {
-      console.error("Export failed", error);
+      console.error("PDF Export failed:", error);
+      setExportError("Export failed. Please try again.");
     } finally {
       setIsExporting(false);
     }
@@ -76,9 +133,12 @@ export function PreviewPage() {
   return (
     <div className="w-full flex flex-col gap-[32px] animate-in fade-in duration-500 pb-[32px]">
       <div className="flex justify-between items-center bg-white border border-[#E5E7EB] p-[24px] rounded-[20px] shadow-sm">
-        <h1 className="text-[24px] font-bold text-[#111827]">
-          Resume Preview
-        </h1>
+        <div>
+          <h1 className="text-[24px] font-bold text-[#111827]">Resume Preview</h1>
+          {exportError && (
+            <p className="text-[13px] text-[#EF4444] mt-1">{exportError}</p>
+          )}
+        </div>
         <div className="flex gap-4">
           <button
             onClick={() => navigate("/form")}
@@ -88,14 +148,22 @@ export function PreviewPage() {
             <FiEdit2 />
             Edit
           </button>
-          
+
           <div className="relative">
             <button
               onClick={() => setIsExportDropdownOpen(!isExportDropdownOpen)}
               className="premium-btn-primary"
               disabled={isExporting}
             >
-              {isExporting ? "Exporting..." : (
+              {isExporting ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  </svg>
+                  Exporting...
+                </span>
+              ) : (
                 <>
                   <FiDownload />
                   Export
@@ -126,7 +194,8 @@ export function PreviewPage() {
         </div>
       </div>
 
-      <div className="w-full flex justify-center bg-[#F8FAFC] rounded-[20px] py-8">
+      {/* The preview is shown with overflow-x:auto so it doesn't break layout on smaller screens */}
+      <div className="w-full flex justify-center bg-[#F8FAFC] rounded-[20px] py-8 overflow-x-auto">
         <ATSProfessionalTemplate />
       </div>
     </div>

@@ -87,5 +87,15 @@
 - Run `npm run build` to verify no TypeScript or Vite errors after major changes.
 
 ## Recent Fixes
-- **Search Bar**: Updated Global Search in `AppShell.tsx` to dynamically filter search options (pages, templates, editors) based on the user's query.
-- **Export Functionality**: Fixed PDF and JPG downloads in `PreviewPage.tsx` by explicitly passing `useCORS: true` and `allowTaint: true` to `html2canvas` to prevent cross-origin rendering bugs.
+- **Search Bar**: Updated Global Search in `AppShell.tsx` to dynamically filter search options (pages, templates, editors) based on the user's query. Filtering uses case-insensitive matching on both the title and the result type label.
+- **Export Functionality (PDF & JPG) — Root Cause Fix**: The original `html2canvas` exports failed silently because:
+  1. `ATSProfessionalTemplate.tsx` used **`react-icons` SVG components** (`FiMail`, `FiPhone`, etc.) — `html2canvas` cannot render SVG elements and silently skips them, corrupting the canvas.
+  2. The Google Fonts `@import` in `index.css` is loaded externally — `html2canvas` cannot resolve external fonts.
+  - **Fix applied to `ATSProfessionalTemplate.tsx`**: Removed all `react-icons` imports. Replaced with plain **Unicode text characters** (✉, ✆, ⊙, etc.) and converted all styles to **inline `style={{}}` props** (no Tailwind classes) so `html2canvas` can read them directly.
+  - **Fix applied to `PreviewPage.tsx`**: The element is **cloned offscreen** into a fixed wrapper appended to `document.body` before capture, ensuring no scroll clipping or layout instability affects the canvas. The download link is also explicitly appended/removed from `document.body` to guarantee the browser triggers the download. Multi-page PDF support added — resumes taller than A4 are sliced into multiple pages automatically.
+
+## Architecture Rules (Anti-Regression)
+- **NEVER use `react-icons` SVG components inside any resume template** — they break `html2canvas` export. Use Unicode characters or text only.
+- **NEVER use Tailwind CSS classes for layout inside resume templates** — use `style={{}}` inline styles so `html2canvas` can read computed values.
+- **Always test PDF + JPG export after any changes to a template component.**
+
