@@ -150,18 +150,40 @@ export function AppShell({ children }: AppShellProps) {
                 <span className="bg-white border border-[#E5E7EB] rounded px-1.5 py-0.5">K</span>
               </div>
 
-              {isSearchFocused && searchQuery && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setIsSearchFocused(false)} />
-                  <div className="absolute top-full mt-2 w-full bg-white border border-[#E5E7EB] rounded-[16px] shadow-lg z-50 overflow-hidden">
-                    <div className="p-2">
-                      <p className="px-3 py-2 text-xs font-semibold text-[#9CA3AF] uppercase">Navigation</p>
-                      <button onClick={() => { navigate("/templates"); setIsSearchFocused(false); setSearchQuery(""); }} className="w-full text-left px-3 py-2 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 rounded-lg">Browse Templates</button>
-                      <button onClick={() => { navigate("/form"); setIsSearchFocused(false); setSearchQuery(""); }} className="w-full text-left px-3 py-2 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 rounded-lg">Resume Editor</button>
+              {isSearchFocused && searchQuery && (() => {
+                const searchOptions = [
+                  { title: "Dashboard", path: "/", type: "Page" },
+                  { title: "Browse Templates", path: "/templates", type: "Navigation" },
+                  { title: "ATS Professional Template", path: "/templates", type: "Template" },
+                  { title: "Resume Editor", path: "/form", type: "Navigation" },
+                ];
+                
+                const filteredOptions = searchOptions.filter(opt => 
+                  opt.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                  opt.type.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+
+                return (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsSearchFocused(false)} />
+                    <div className="absolute top-full mt-2 w-full bg-white border border-[#E5E7EB] rounded-[16px] shadow-lg z-50 overflow-hidden">
+                      <div className="p-2">
+                        <p className="px-3 py-2 text-xs font-semibold text-[#9CA3AF] uppercase">Search Results</p>
+                        {filteredOptions.length > 0 ? (
+                          filteredOptions.map((opt, i) => (
+                            <button key={i} onClick={() => { navigate(opt.path); setIsSearchFocused(false); setSearchQuery(""); }} className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 rounded-lg">
+                              <span>{opt.title}</span>
+                              <span className="text-xs text-gray-400">{opt.type}</span>
+                            </button>
+                          ))
+                        ) : (
+                          <p className="px-3 py-2 text-sm text-gray-500">No results found.</p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </>
-              )}
+                  </>
+                );
+              })()}
             </div>
           </div>
           

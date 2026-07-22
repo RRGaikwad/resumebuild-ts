@@ -21,7 +21,11 @@ export function PreviewPage() {
       const resume = document.querySelector("#resume-preview-container") as HTMLElement;
       if (!resume) throw new Error("Resume container not found");
       
-      const canvas = await html2canvas(resume, { scale: 2 });
+      const canvas = await html2canvas(resume, { 
+        scale: 2,
+        useCORS: true,
+        allowTaint: true
+      });
       const link = document.createElement("a");
       link.download = `resume-${template}.jpg`;
       link.href = canvas.toDataURL("image/jpeg");
@@ -40,7 +44,11 @@ export function PreviewPage() {
       const resume = document.querySelector("#resume-preview-container") as HTMLElement;
       if (!resume) throw new Error("Resume container not found");
 
-      const canvas = await html2canvas(resume, { scale: 2 });
+      const canvas = await html2canvas(resume, { 
+        scale: 2,
+        useCORS: true,
+        allowTaint: true
+      });
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",

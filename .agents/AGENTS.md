@@ -86,3 +86,6 @@
 - Prioritize mobile-first responsiveness (BottomNav on mobile, sidebar on `md+`).
 - Run `npm run build` to verify no TypeScript or Vite errors after major changes.
 
+## Recent Fixes
+- **Search Bar**: Updated Global Search in `AppShell.tsx` to dynamically filter search options (pages, templates, editors) based on the user's query.
+- **Export Functionality**: Fixed PDF and JPG downloads in `PreviewPage.tsx` by explicitly passing `useCORS: true` and `allowTaint: true` to `html2canvas` to prevent cross-origin rendering bugs.
