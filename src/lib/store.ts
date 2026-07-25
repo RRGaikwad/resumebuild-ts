@@ -71,6 +71,7 @@ export interface ResumeData {
   achievements: string[];
   languages: Language[];
   template: string;
+  resumeId: string | null;
 }
 
 // Initial state - Populated with dummy data exactly matching the user's ATS Template image
@@ -154,6 +155,7 @@ const initialState: ResumeData = {
     { name: "Hindi", proficiency: "Professional Proficiency", level: 85 }
   ],
   template: "ats-professional",
+  resumeId: null,
 };
 
 export interface ResumeStore extends ResumeData {
@@ -167,6 +169,7 @@ export interface ResumeStore extends ResumeData {
   setAchievements: (achievements: string[]) => void;
   setLanguages: (languages: Language[]) => void;
   setTemplate: (template: string) => void;
+  setResumeId: (id: string | null) => void;
   reset: () => void;
 }
 
@@ -182,5 +185,6 @@ export const useResumeStore = create<ResumeStore>((set) => ({
   setAchievements: (achievements) => set({ achievements }),
   setLanguages: (languages) => set({ languages }),
   setTemplate: (template) => set({ template }),
+  setResumeId: (resumeId) => set({ resumeId }),
   reset: () => set(initialState),
 }));

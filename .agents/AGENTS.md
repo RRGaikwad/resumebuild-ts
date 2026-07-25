@@ -97,6 +97,7 @@
     - The element is **cloned offscreen** into a fixed wrapper appended to `document.body` before capture, ensuring no scroll clipping or layout instability affects the canvas.
     - The download link is explicitly appended/removed from `document.body` to guarantee the browser triggers the download.
     - **PDF now uses `unit: "px"` with a custom `format: [cssWidth, cssHeight]`** matching exactly the canvas dimensions (divided by scale factor 2). This makes the PDF page identical to the JPG — no scaling, no slicing, no distortion.
+- **Dashboard Synchronization Fix**: Connected `FormPage.tsx` and `PreviewPage.tsx` to Firestore. Resume data is now saved to Firestore upon generating a preview (with an ATS score calculated dynamically), and PDF/JPG exports log "download" events. This ensures the Dashboard (Resumes Created, Downloads, Resume Strength, and Recent Activity) updates correctly for logged-in users. Added `resumeId` to `store.ts` to track and update the same resume document.
 
 ## Architecture Rules (Anti-Regression)
 - **NEVER use `react-icons` SVG components inside any resume template** — they break `html2canvas` export. Use Unicode characters or text only.

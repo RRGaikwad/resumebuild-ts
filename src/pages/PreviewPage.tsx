@@ -7,6 +7,8 @@ import { FiDownload, FiEdit2, FiImage, FiFileText, FiPrinter } from "react-icons
 import { ATSProfessionalTemplate } from "../components/templates/ATSProfessionalTemplate";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useAuth } from "../lib/AuthContext";
+import { logActivity } from "../lib/firestoreService";
 
 // ─── Export helpers ────────────────────────────────────────────────────────────
 // Root cause of previous failures: html2canvas cannot render SVG elements
@@ -48,6 +50,7 @@ async function captureResumeCanvas(): Promise<HTMLCanvasElement> {
 export function PreviewPage() {
   const { template } = useResumeStore();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
@@ -64,6 +67,10 @@ export function PreviewPage() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      
+      if (user) {
+        logActivity(user.uid, `Downloaded resume`, "download").catch(console.error);
+      }
     } catch (error) {
       console.error("JPG Export failed:", error);
       setExportError("Export failed. Please try again.");
@@ -96,6 +103,10 @@ export function PreviewPage() {
 
       pdf.addImage(imgData, "JPEG", 0, 0, cssWidth, cssHeight);
       pdf.save(`resume-${template || "download"}.pdf`);
+
+      if (user) {
+        logActivity(user.uid, `Downloaded resume`, "download").catch(console.error);
+      }
     } catch (error) {
       console.error("PDF Export failed:", error);
       setExportError("Export failed. Please try again.");
