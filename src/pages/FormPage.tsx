@@ -46,8 +46,19 @@ export function FormPage() {
         const title = state.profile.name ? `${state.profile.name}'s Resume` : "Untitled Resume";
         const atsScore = calculateAtsScore(state);
         
-        // Prepare data to save, omitting functions and the resumeId itself
-        const { setProfile, setExperience, setEducation, setSkills, setCategorizedSkills, setProjects, setCertifications, setAchievements, setLanguages, setTemplate, setResumeId, setInterests, reset, resumeId: currentId, ...saveData } = state as any;
+        // Prepare data to save, explicitly extracting only data properties
+        const saveData = {
+          profile: state.profile,
+          experience: state.experience,
+          education: state.education,
+          skills: state.skills,
+          categorizedSkills: state.categorizedSkills,
+          projects: state.projects,
+          certifications: state.certifications,
+          achievements: state.achievements,
+          languages: state.languages,
+          interests: state.interests,
+        };
 
         if (resumeId) {
           await updateResume(user.uid, resumeId, title, atsScore, saveData);
