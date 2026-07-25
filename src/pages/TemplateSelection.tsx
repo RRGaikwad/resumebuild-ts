@@ -10,6 +10,12 @@ export function TemplateSelection() {
       image: "/ats-template-thumbnail.jpg",
       templateId: "ats-professional",
     },
+    {
+      title: "Modern Sidebar Template",
+      description: "A visually rich two-column layout with a dark navy sidebar featuring skills, languages & interests.",
+      image: "/modern-sidebar-thumbnail.jpg",
+      templateId: "modern-sidebar",
+    },
   ];
 
   return (

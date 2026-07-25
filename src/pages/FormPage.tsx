@@ -7,6 +7,7 @@ import { ExperienceForm } from "../components/FormFields/ExperienceForm";
 import { EducationForm } from "../components/FormFields/EducationForm";
 import { SkillsForm } from "../components/FormFields/SkillsForm";
 import { LanguagesForm } from "../components/FormFields/LanguagesForm";
+import { InterestsForm } from "../components/FormFields/InterestsForm";
 import { useResumeStore } from "../lib/store";
 import { useAuth } from "../lib/AuthContext";
 import { createResume, updateResume } from "../lib/firestoreService";
@@ -72,6 +73,7 @@ export function FormPage() {
         <EducationForm />
         <SkillsForm />
         <LanguagesForm />
+        <InterestsForm />
         <div className="text-center">
           <button
             onClick={handleSubmit}

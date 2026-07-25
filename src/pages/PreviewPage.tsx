@@ -5,6 +5,7 @@ import { useResumeStore } from "../lib/store";
 import { useState } from "react";
 import { FiDownload, FiEdit2, FiImage, FiFileText, FiPrinter } from "react-icons/fi";
 import { ATSProfessionalTemplate } from "../components/templates/ATSProfessionalTemplate";
+import { ModernSidebarTemplate } from "../components/templates/ModernSidebarTemplate";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useAuth } from "../lib/AuthContext";
@@ -186,7 +187,10 @@ export function PreviewPage() {
 
       {/* The preview is shown with overflow-x:auto so it doesn't break layout on smaller screens */}
       <div className="w-full flex justify-center bg-[#F8FAFC] rounded-[20px] py-8 overflow-x-auto">
-        <ATSProfessionalTemplate />
+        {template === "modern-sidebar"
+          ? <ModernSidebarTemplate />
+          : <ATSProfessionalTemplate />
+        }
       </div>
     </div>
   );

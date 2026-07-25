@@ -47,6 +47,7 @@ export interface Project {
 export interface Skill {
   name: string;
   level: number; // 0-100 (for progress bar templates)
+  category?: string; // Optional skill group (e.g. "Frontend", "Backend")
 }
 
 export interface CategorizedSkill {
@@ -70,6 +71,7 @@ export interface ResumeData {
   certifications: string[];
   achievements: string[];
   languages: Language[];
+  interests: string[];
   template: string;
   resumeId: string | null;
 }
@@ -77,11 +79,12 @@ export interface ResumeData {
 // Initial state - Populated with dummy data exactly matching the user's ATS Template image
 const initialState: ResumeData = {
   profile: {
-    name: "JOHN DOE",
+    name: "ROHAN GAIKWAD",
     title: "FULL STACK DEVELOPER",
-    email: "john.doe@email.com",
+    email: "rohan.gaikwad@email.com",
     phone: "+91 98765 43210",
     address: "Pune, Maharashtra, India",
+    photo: "",
     summary: "Motivated and detail-oriented Full Stack Developer with 2+ years of experience in designing, developing, and deploying scalable web applications. Proficient in modern JavaScript frameworks, backend technologies, and databases. Passionate about solving real-world problems and delivering clean, efficient, and user-friendly solutions.",
     socialLinks: {
       linkedin: "linkedin.com/in/rohan-gaikwad",
@@ -131,7 +134,25 @@ const initialState: ResumeData = {
       description: ""
     }
   ],
-  skills: [], // Universal flat skills
+  skills: [
+    { name: "React.js",           level: 90, category: "FRONTEND" },
+    { name: "JavaScript (ES6+)",  level: 88, category: "FRONTEND" },
+    { name: "HTML5 & CSS3",       level: 92, category: "FRONTEND" },
+    { name: "Tailwind CSS",       level: 80, category: "FRONTEND" },
+    { name: "Bootstrap",          level: 75, category: "FRONTEND" },
+    { name: "Node.js",            level: 85, category: "BACKEND"  },
+    { name: "Express.js",         level: 82, category: "BACKEND"  },
+    { name: "PHP",                level: 70, category: "BACKEND"  },
+    { name: "REST APIs",          level: 88, category: "BACKEND"  },
+    { name: "MySQL",              level: 80, category: "DATABASE" },
+    { name: "MongoDB",            level: 72, category: "DATABASE" },
+    { name: "Firebase",           level: 78, category: "DATABASE" },
+    { name: "Git & GitHub",       level: 88, category: "TOOLS & OTHERS" },
+    { name: "AWS",                level: 70, category: "TOOLS & OTHERS" },
+    { name: "Docker",             level: 65, category: "TOOLS & OTHERS" },
+    { name: "Postman",            level: 80, category: "TOOLS & OTHERS" },
+    { name: "VS Code",            level: 95, category: "TOOLS & OTHERS" },
+  ], // Skills with categories (used by Modern Sidebar template)
   categorizedSkills: [
     { category: "Languages", items: "JavaScript, HTML, CSS, PHP, SQL" },
     { category: "Frontend", items: "React.js, Bootstrap, Tailwind CSS" },
@@ -154,6 +175,7 @@ const initialState: ResumeData = {
     { name: "Marathi", proficiency: "Native Proficiency", level: 100 },
     { name: "Hindi", proficiency: "Professional Proficiency", level: 85 }
   ],
+  interests: ["Coding", "Travel", "Reading", "Fitness", "Music"],
   template: "ats-professional",
   resumeId: null,
 };
@@ -168,6 +190,7 @@ export interface ResumeStore extends ResumeData {
   setCertifications: (certifications: string[]) => void;
   setAchievements: (achievements: string[]) => void;
   setLanguages: (languages: Language[]) => void;
+  setInterests: (interests: string[]) => void;
   setTemplate: (template: string) => void;
   setResumeId: (id: string | null) => void;
   reset: () => void;
@@ -184,6 +207,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
   setCertifications: (certifications) => set({ certifications }),
   setAchievements: (achievements) => set({ achievements }),
   setLanguages: (languages) => set({ languages }),
+  setInterests: (interests) => set({ interests }),
   setTemplate: (template) => set({ template }),
   setResumeId: (resumeId) => set({ resumeId }),
   reset: () => set(initialState),

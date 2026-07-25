@@ -104,4 +104,12 @@
 - **NEVER use Tailwind CSS classes for layout inside resume templates** — use `style={{}}` inline styles so `html2canvas` can read computed values.
 - **NEVER use `format: "a4"` with `unit: "mm"` for PDF export** — this forces a fixed page size that distorts the resume. Always use `unit: "px"` with `format: [canvas.width/2, canvas.height/2]` so the PDF page matches the canvas exactly (identical to JPG output).
 - **Always test PDF + JPG export after any changes to a template component.**
+- **Template store data is a superset**: The `ResumeData` store holds fields for ALL templates. Individual templates only read the fields they need. New fields added for one template are ignored by others — this is by design and intentional.
+- **Skills use the `category` field** for the Modern Sidebar template's grouped skill bars. The `categorizedSkills` field is used by the ATS template. Both co-exist safely.
+
+## Templates
+| ID | Component | Description |
+|---|---|---|
+| `ats-professional` | `ATSProfessionalTemplate.tsx` | Clean single-column ATS-optimized layout. Uses `categorizedSkills`, no photo. |
+| `modern-sidebar` | `ModernSidebarTemplate.tsx` | Two-column dark navy sidebar layout. Uses `skills` (with `category`), `photo`, `interests`, `languages`. |
 
