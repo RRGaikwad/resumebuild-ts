@@ -2,22 +2,22 @@
 
 import { TemplateCard } from "../components/TemplateCard";
 
-export function TemplateSelection() {
-  const templates = [
-    {
-      title: "ATS Professional Template",
-      description: "A clean, minimalist layout engineered to pass applicant tracking systems with maximum accuracy.",
-      image: "/ats-template-thumbnail.jpg",
-      templateId: "ats-professional",
-    },
-    {
-      title: "Modern Sidebar Template",
-      description: "A visually rich two-column layout with a dark navy sidebar featuring skills, languages & interests.",
-      image: "/modern-sidebar-thumbnail.jpg",
-      templateId: "modern-sidebar",
-    },
-  ];
+export const templates = [
+  {
+    title: "ATS Professional Template",
+    description: "A clean, minimalist layout engineered to pass applicant tracking systems with maximum accuracy.",
+    image: "/ats-template-thumbnail.jpg",
+    templateId: "ats-professional",
+  },
+  {
+    title: "Modern Sidebar Template",
+    description: "A visually rich two-column layout with a dark navy sidebar featuring skills, languages & interests.",
+    image: "/modern-sidebar-thumbnail.jpg",
+    templateId: "modern-sidebar",
+  },
+];
 
+export function TemplateSelection() {
   return (
     <div className="w-full flex flex-col space-y-8 p-4">
       <div className="text-center space-y-4">

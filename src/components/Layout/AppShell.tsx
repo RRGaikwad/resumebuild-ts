@@ -5,6 +5,7 @@ import { BottomNav } from "./BottomNav";
 import { useAuth } from "../../lib/AuthContext";
 import { AccountModal } from "../AccountModal";
 import clsx from "clsx";
+import { templates } from "../../pages/TemplateSelection";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -154,9 +155,12 @@ export function AppShell({ children }: AppShellProps) {
                 const searchOptions = [
                   { title: "Dashboard", path: "/", type: "Page" },
                   { title: "Browse Templates", path: "/templates", type: "Navigation" },
-                  { title: "ATS Professional Template", path: "/templates", type: "Template" },
-                  { title: "Modern Sidebar Template", path: "/templates", type: "Template" },
                   { title: "Resume Editor", path: "/form", type: "Navigation" },
+                  ...templates.map((t) => ({
+                    title: t.title,
+                    path: `/form?template=${t.templateId}`,
+                    type: "Template",
+                  })),
                 ];
                 
                 const filteredOptions = searchOptions.filter(opt => 

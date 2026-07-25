@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 // Define types for resume data (Superset for all templates)
 export interface Profile {
@@ -196,19 +197,26 @@ export interface ResumeStore extends ResumeData {
   reset: () => void;
 }
 
-export const useResumeStore = create<ResumeStore>((set) => ({
-  ...initialState,
-  setProfile: (profile) => set((state) => ({ profile: { ...state.profile, ...profile } })),
-  setExperience: (experience) => set({ experience }),
-  setEducation: (education) => set({ education }),
-  setSkills: (skills) => set({ skills }),
-  setCategorizedSkills: (categorizedSkills) => set({ categorizedSkills }),
-  setProjects: (projects) => set({ projects }),
-  setCertifications: (certifications) => set({ certifications }),
-  setAchievements: (achievements) => set({ achievements }),
-  setLanguages: (languages) => set({ languages }),
-  setInterests: (interests) => set({ interests }),
-  setTemplate: (template) => set({ template }),
-  setResumeId: (resumeId) => set({ resumeId }),
-  reset: () => set(initialState),
-}));
+export const useResumeStore = create<ResumeStore>()(
+  persist(
+    (set) => ({
+      ...initialState,
+      setProfile: (profile) => set((state) => ({ profile: { ...state.profile, ...profile } })),
+      setExperience: (experience) => set({ experience }),
+      setEducation: (education) => set({ education }),
+      setSkills: (skills) => set({ skills }),
+      setCategorizedSkills: (categorizedSkills) => set({ categorizedSkills }),
+      setProjects: (projects) => set({ projects }),
+      setCertifications: (certifications) => set({ certifications }),
+      setAchievements: (achievements) => set({ achievements }),
+      setLanguages: (languages) => set({ languages }),
+      setInterests: (interests) => set({ interests }),
+      setTemplate: (template) => set({ template }),
+      setResumeId: (resumeId) => set({ resumeId }),
+      reset: () => set(initialState),
+    }),
+    {
+      name: "resume-storage",
+    }
+  )
+);
