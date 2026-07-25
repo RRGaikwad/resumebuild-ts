@@ -96,7 +96,7 @@ function SkillBar({ name, level }: { name: string; level: number }) {
   const pct = Math.min(100, Math.max(0, level));
   return (
     <div style={{ marginBottom: 7 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
         <span style={{ fontSize: 11, color: SIDEBAR_TEXT }}>{name}</span>
       </div>
       <div style={{ height: 4, borderRadius: 2, background: PROGRESS_BG, overflow: "hidden" }}>
@@ -259,7 +259,7 @@ export function ModernSidebarTemplate() {
               {languages.map((lang, i) => (
                 <div key={i}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: SIDEBAR_TEXT }}>{lang.name}</div>
-                  <div style={{ fontSize: 10, color: SIDEBAR_MUTED, marginBottom: 2 }}>{lang.proficiency}</div>
+                  <div style={{ fontSize: 10, color: SIDEBAR_MUTED, marginBottom: 6 }}>{lang.proficiency}</div>
                   <DotRating level={lang.level} />
                 </div>
               ))}
@@ -278,11 +278,11 @@ export function ModernSidebarTemplate() {
                     width: 34, height: 34, borderRadius: "50%",
                     background: SIDEBAR_LABEL_BG,
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 14, color: ACCENT_LIGHT,
+                    fontSize: 14, color: ACCENT_LIGHT, lineHeight: 1, paddingBottom: 2,
                   }}>
                     {getInterestIcon(interest)}
                   </div>
-                  <span style={{ fontSize: 9, color: SIDEBAR_MUTED, textAlign: "center" as const }}>{interest}</span>
+                  <span style={{ fontSize: 9, color: SIDEBAR_MUTED, textAlign: "center" as const, marginTop: 4 }}>{interest}</span>
                 </div>
               ))}
             </div>

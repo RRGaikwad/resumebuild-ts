@@ -47,7 +47,7 @@ export function FormPage() {
         const atsScore = calculateAtsScore(state);
         
         // Prepare data to save, omitting functions and the resumeId itself
-        const { setProfile, setExperience, setEducation, setSkills, setCategorizedSkills, setProjects, setCertifications, setAchievements, setLanguages, setTemplate, setResumeId, reset, resumeId: currentId, ...saveData } = state as any;
+        const { setProfile, setExperience, setEducation, setSkills, setCategorizedSkills, setProjects, setCertifications, setAchievements, setLanguages, setTemplate, setResumeId, setInterests, reset, resumeId: currentId, ...saveData } = state as any;
 
         if (resumeId) {
           await updateResume(user.uid, resumeId, title, atsScore, saveData);

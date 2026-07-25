@@ -155,6 +155,7 @@ export function AppShell({ children }: AppShellProps) {
                   { title: "Dashboard", path: "/", type: "Page" },
                   { title: "Browse Templates", path: "/templates", type: "Navigation" },
                   { title: "ATS Professional Template", path: "/templates", type: "Template" },
+                  { title: "Modern Sidebar Template", path: "/templates", type: "Template" },
                   { title: "Resume Editor", path: "/form", type: "Navigation" },
                 ];
                 
