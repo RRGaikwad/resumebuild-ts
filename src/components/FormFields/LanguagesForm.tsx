@@ -2,7 +2,11 @@
 
 import { useResumeStore } from "../../lib/store";
 
-export function LanguagesForm() {
+interface LanguagesFormProps {
+  template: string;
+}
+
+export function LanguagesForm({ template }: LanguagesFormProps) {
   const { languages, setLanguages } = useResumeStore();
 
   const addLanguage = () => {
@@ -37,19 +41,22 @@ export function LanguagesForm() {
                 value={language.name}
                 onChange={(e) => updateLanguage(index, "name", e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                placeholder={template === "ats-professional" ? "e.g. English, Native" : "e.g. English"}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Proficiency (0-100)</label>
-              <input
-                type="number"
-                value={language.level}
-                onChange={(e) => updateLanguage(index, "level", Number(e.target.value))}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                min="0"
-                max="100"
-              />
-            </div>
+            {template !== "ats-professional" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Proficiency (0-100)</label>
+                <input
+                  type="number"
+                  value={language.level}
+                  onChange={(e) => updateLanguage(index, "level", Number(e.target.value))}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  min="0"
+                  max="100"
+                />
+              </div>
+            )}
           </div>
           <button
             onClick={() => removeLanguage(index)}

@@ -8,6 +8,10 @@ import { EducationForm } from "../components/FormFields/EducationForm";
 import { SkillsForm } from "../components/FormFields/SkillsForm";
 import { LanguagesForm } from "../components/FormFields/LanguagesForm";
 import { InterestsForm } from "../components/FormFields/InterestsForm";
+import { ProjectsForm } from "../components/FormFields/ProjectsForm";
+import { CategorizedSkillsForm } from "../components/FormFields/CategorizedSkillsForm";
+import { CertificationsForm } from "../components/FormFields/CertificationsForm";
+import { AchievementsForm } from "../components/FormFields/AchievementsForm";
 import { useResumeStore } from "../lib/store";
 import { useAuth } from "../lib/AuthContext";
 import { createResume, updateResume } from "../lib/firestoreService";
@@ -75,22 +79,49 @@ export function FormPage() {
     navigate("/preview");
   };
 
+  const renderTemplateForms = () => {
+    if (templateParam === "modern-sidebar") {
+      return (
+        <>
+          <ProfileForm template={templateParam} />
+          <ExperienceForm />
+          <EducationForm />
+          <SkillsForm />
+          <LanguagesForm template={templateParam} />
+          <InterestsForm />
+        </>
+      );
+    }
+
+    // Default to ATS Professional layout
+    return (
+      <>
+        <ProfileForm template={templateParam} />
+        <ExperienceForm />
+        <EducationForm />
+        <ProjectsForm />
+        <CategorizedSkillsForm />
+        <CertificationsForm />
+        <AchievementsForm />
+        <LanguagesForm template={templateParam} />
+      </>
+    );
+  };
+
   return (
     <div className="w-full flex flex-col gap-[24px] md:gap-[32px] animate-in fade-in duration-500 pb-[32px]">
       {/* Header */}
       <div className="flex flex-col gap-1">
         <h1 className="text-[28px] md:text-[40px] font-bold text-[#111827]">Resume Editor</h1>
-        <p className="text-[15px] text-[#6B7280]">Fill in your details to build your resume.</p>
+        <p className="text-[15px] text-[#6B7280]">
+          Fill in your details to build your {templateParam === "modern-sidebar" ? "Modern Sidebar" : "ATS Professional"} resume.
+        </p>
       </div>
 
       {/* Form card */}
       <div className="bg-white rounded-[20px] border border-[#E5E7EB] shadow-sm p-[16px] md:p-[32px] space-y-8">
-        <ProfileForm />
-        <ExperienceForm />
-        <EducationForm />
-        <SkillsForm />
-        <LanguagesForm />
-        <InterestsForm />
+        
+        {renderTemplateForms()}
 
         {/* Submit */}
         <div className="flex justify-end pt-4 border-t border-[#E5E7EB]">
