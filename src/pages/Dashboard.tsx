@@ -173,9 +173,7 @@ export function Dashboard() {
                 resumes.map((resume) => (
                   <ResumeListItem
                     key={resume.id}
-                    title={resume.title}
-                    updatedAt={timeAgo(resume.updatedAt)}
-                    score={resume.atsScore}
+                    resume={resume}
                     isLatest={resume.id === resumes[0]?.id}
                   />
                 ))
@@ -184,7 +182,10 @@ export function Dashboard() {
 
             <div className="p-[24px] bg-[#F8FAFC]">
               <button
-                onClick={() => navigate("/templates")}
+                onClick={() => {
+                  useResumeStore.getState().reset();
+                  navigate("/templates");
+                }}
                 className="w-full h-[56px] border-[2px] border-dashed border-[#E5E7EB] hover:border-[#2563EB] hover:bg-[#eff6ff] text-[#2563EB] rounded-[12px] flex items-center justify-center gap-2 transition-all font-semibold text-[15px]"
               >
                 <FiPlus className="text-xl" /> Create New Resume
@@ -275,7 +276,7 @@ export function Dashboard() {
               </div>
             ) : (
               <div className="relative pl-3 flex flex-col gap-[28px] before:absolute before:inset-y-3 before:left-[27px] before:w-px before:bg-[#E5E7EB]">
-                {activities.map((act) => {
+                {activities.slice(0, 6).map((act) => {
                   const { icon, bg } = activityMeta(act.type);
                   return (
                     <div key={act.id} className="relative flex gap-4">

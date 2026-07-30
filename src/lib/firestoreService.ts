@@ -114,7 +114,7 @@ export function subscribeToActivity(
   const q = query(activityCol(uid), orderBy("createdAt", "desc"));
   return onSnapshot(q, (snap) => {
     const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() } as ActivityDocument));
-    cb(docs.slice(0, 6)); // Show latest 6 activities
+    cb(docs);
   });
 }
 

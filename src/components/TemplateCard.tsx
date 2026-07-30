@@ -1,6 +1,7 @@
 "use client";
 
 import { useNavigate } from "react-router-dom";
+import { useResumeStore } from "../lib/store";
 
 type TemplateCardProps = {
   title: string;
@@ -11,8 +12,11 @@ type TemplateCardProps = {
 
 export function TemplateCard({ title, description, image, templateId }: TemplateCardProps) {
   const navigate = useNavigate();
+  const { reset, setTemplate } = useResumeStore();
 
   const handleSelect = () => {
+    reset();
+    setTemplate(templateId);
     navigate(`/form?template=${templateId}`);
   };
 

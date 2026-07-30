@@ -194,6 +194,7 @@ export interface ResumeStore extends ResumeData {
   setInterests: (interests: string[]) => void;
   setTemplate: (template: string) => void;
   setResumeId: (id: string | null) => void;
+  loadResume: (id: string, data: Partial<ResumeData>) => void;
   reset: () => void;
 }
 
@@ -213,6 +214,7 @@ export const useResumeStore = create<ResumeStore>()(
       setInterests: (interests) => set({ interests }),
       setTemplate: (template) => set({ template }),
       setResumeId: (resumeId) => set({ resumeId }),
+      loadResume: (id, data) => set({ ...initialState, ...data, resumeId: id }),
       reset: () => set(initialState),
     }),
     {
