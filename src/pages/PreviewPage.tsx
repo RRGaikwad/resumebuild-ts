@@ -2,7 +2,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { useResumeStore } from "../lib/store";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FiDownload, FiEdit2, FiImage, FiFileText, FiPrinter } from "react-icons/fi";
 import { ATSProfessionalTemplate } from "../components/templates/ATSProfessionalTemplate";
 import { ModernSidebarTemplate } from "../components/templates/ModernSidebarTemplate";
@@ -11,23 +11,31 @@ import jsPDF from "jspdf";
 import { useAuth } from "../lib/AuthContext";
 import { logActivity } from "../lib/firestoreService";
 
-// ─── Export helpers ────────────────────────────────────────────────────────────
-// Root cause of previous failures: html2canvas cannot render SVG elements
-// (react-icons) and cannot resolve external fonts (@import Google Fonts).
-// Fix: ATSProfessionalTemplate uses only inline styles + Unicode chars (no SVGs).
-// We also clone the element offscreen so its layout is stable during capture.
+// ─── Template widths (must match the fixed width in each template component) ──
+const TEMPLATE_WIDTHS: Record<string, number> = {
+  "ats-professional": 850,
+  "modern-sidebar": 794,
+};
 
-async function captureResumeCanvas(): Promise<HTMLCanvasElement> {
+// ─── Export helper ─────────────────────────────────────────────────────────────
+// KEY: We force the wrapper to the template's FULL design width before capture.
+// This prevents mobile viewports from clipping or scaling the output.
+async function captureResumeCanvas(templateId: string): Promise<HTMLCanvasElement> {
   const source = document.querySelector("#resume-preview-container") as HTMLElement;
   if (!source) throw new Error("Resume container not found");
 
-  // Clone into a fixed offscreen container so scrolling / clipping don't cut it off
+  const designWidth = TEMPLATE_WIDTHS[templateId] ?? 850;
+
+  // Clone into a fixed offscreen container at full design width
   const wrapper = document.createElement("div");
   wrapper.style.cssText =
-    "position:fixed;top:0;left:-9999px;z-index:-1;pointer-events:none;";
+    `position:fixed;top:0;left:-${designWidth + 100}px;z-index:-1;pointer-events:none;width:${designWidth}px;overflow:visible;`;
+
   const clone = source.cloneNode(true) as HTMLElement;
-  // Ensure the clone has the explicit pixel width so html2canvas sees full width
-  clone.style.width = source.offsetWidth + "px";
+  // Reset any transform-origin / scale that might have been applied for mobile view
+  clone.style.transform = "none";
+  clone.style.transformOrigin = "unset";
+  clone.style.width = designWidth + "px";
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
 
@@ -38,9 +46,9 @@ async function captureResumeCanvas(): Promise<HTMLCanvasElement> {
       allowTaint: false,
       backgroundColor: "#ffffff",
       logging: false,
-      width: source.offsetWidth,
-      height: source.scrollHeight,
-      windowWidth: source.offsetWidth,
+      width: designWidth,
+      height: clone.scrollHeight,
+      windowWidth: designWidth,
     });
     return canvas;
   } finally {
@@ -48,6 +56,7 @@ async function captureResumeCanvas(): Promise<HTMLCanvasElement> {
   }
 }
 
+// ─── Component ─────────────────────────────────────────────────────────────────
 export function PreviewPage() {
   const { template } = useResumeStore();
   const navigate = useNavigate();
@@ -55,22 +64,43 @@ export function PreviewPage() {
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  const previewWrapperRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  const templateId = template ?? "ats-professional";
+  const designWidth = TEMPLATE_WIDTHS[templateId] ?? 850;
+
+  // Dynamically compute the CSS scale so the template fits the preview container
+  useEffect(() => {
+    function computeScale() {
+      if (!previewWrapperRef.current) return;
+      const containerWidth = previewWrapperRef.current.clientWidth - 32; // 16px padding each side
+      if (containerWidth < designWidth) {
+        setScale(containerWidth / designWidth);
+      } else {
+        setScale(1);
+      }
+    }
+    computeScale();
+    window.addEventListener("resize", computeScale);
+    return () => window.removeEventListener("resize", computeScale);
+  }, [designWidth]);
 
   const handleDownloadJPG = async () => {
     setIsExporting(true);
     setIsExportDropdownOpen(false);
     setExportError(null);
     try {
-      const canvas = await captureResumeCanvas();
+      const canvas = await captureResumeCanvas(templateId);
       const link = document.createElement("a");
-      link.download = `resume-${template || "download"}.jpg`;
+      link.download = `resume-${templateId}.jpg`;
       link.href = canvas.toDataURL("image/jpeg", 0.95);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       if (user) {
-        logActivity(user.uid, `Downloaded resume`, "download").catch(console.error);
+        logActivity(user.uid, `Downloaded resume as JPG`, "download").catch(console.error);
       }
     } catch (error) {
       console.error("JPG Export failed:", error);
@@ -85,13 +115,10 @@ export function PreviewPage() {
     setIsExportDropdownOpen(false);
     setExportError(null);
     try {
-      const canvas = await captureResumeCanvas();
+      const canvas = await captureResumeCanvas(templateId);
       const imgData = canvas.toDataURL("image/jpeg", 0.95);
 
-      // KEY FIX: Use unit:"px" and match page dimensions to the canvas size
-      // (divided by scale factor 2). This means the PDF page IS the resume —
-      // no forced A4 scaling, no multi-page slicing, identical output to JPG.
-      // The canvas is rendered at scale:2 so CSS pixel dimensions = canvas / 2.
+      // canvas is rendered at scale:2, so CSS dimensions are canvas / 2
       const cssWidth = canvas.width / 2;
       const cssHeight = canvas.height / 2;
 
@@ -103,10 +130,10 @@ export function PreviewPage() {
       });
 
       pdf.addImage(imgData, "JPEG", 0, 0, cssWidth, cssHeight);
-      pdf.save(`resume-${template || "download"}.pdf`);
+      pdf.save(`resume-${templateId}.pdf`);
 
       if (user) {
-        logActivity(user.uid, `Downloaded resume`, "download").catch(console.error);
+        logActivity(user.uid, `Downloaded resume as PDF`, "download").catch(console.error);
       }
     } catch (error) {
       console.error("PDF Export failed:", error);
@@ -122,15 +149,20 @@ export function PreviewPage() {
   };
 
   return (
-    <div className="w-full flex flex-col gap-[32px] animate-in fade-in duration-500 pb-[32px]">
-      <div className="flex justify-between items-center bg-white border border-[#E5E7EB] p-[24px] rounded-[20px] shadow-sm">
+    <div className="w-full flex flex-col gap-[24px] md:gap-[32px] animate-in fade-in duration-500 pb-[32px]">
+
+      {/* ─── Toolbar ─── */}
+      <div className="flex flex-wrap justify-between items-center gap-3 bg-white border border-[#E5E7EB] p-[16px] md:p-[24px] rounded-[20px] shadow-sm">
         <div>
-          <h1 className="text-[24px] font-bold text-[#111827]">Resume Preview</h1>
+          <h1 className="text-[20px] md:text-[24px] font-bold text-[#111827]">Resume Preview</h1>
+          <p className="text-[13px] text-[#6B7280] mt-0.5 hidden md:block">
+            Your resume is ready. Export it as PDF or JPG.
+          </p>
           {exportError && (
             <p className="text-[13px] text-[#EF4444] mt-1">{exportError}</p>
           )}
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           <button
             onClick={() => navigate("/form")}
             className="premium-btn-secondary"
@@ -185,12 +217,43 @@ export function PreviewPage() {
         </div>
       </div>
 
-      {/* The preview is shown with overflow-x:auto so it doesn't break layout on smaller screens */}
-      <div className="w-full flex justify-center bg-[#F8FAFC] rounded-[20px] py-8 overflow-x-auto">
-        {template === "modern-sidebar"
-          ? <ModernSidebarTemplate />
-          : <ATSProfessionalTemplate />
-        }
+      {/* ─── Mobile scale hint ─── */}
+      {scale < 1 && (
+        <p className="text-center text-[12px] text-[#9CA3AF] -mt-2">
+          Pinch to zoom · Exports always in full quality
+        </p>
+      )}
+
+      {/* ─── Preview container ─────────────────────────────────────────────────
+          The outer div measures available width. The inner div holds the template
+          at its FULL design width, then scaled down with CSS transform so it fits
+          the screen visually — without affecting what html2canvas captures.
+      ──────────────────────────────────────────────────────────────────────── */}
+      <div
+        ref={previewWrapperRef}
+        className="w-full flex justify-center bg-[#F8FAFC] rounded-[20px] py-6 md:py-8 overflow-x-auto"
+        style={{
+          // When scaling, shrink the wrapper height to match scaled template height
+          // so there's no extra white space below
+          minHeight: scale < 1 ? `${Math.round(1100 * scale) + 48}px` : undefined,
+        }}
+      >
+        {/* Scale wrapper — transforms visually but doesn't change DOM layout */}
+        <div
+          style={{
+            transform: `scale(${scale})`,
+            transformOrigin: "top center",
+            // Keep the container's actual width the full design width
+            width: `${designWidth}px`,
+            // Adjust the element's layout height so no gap appears below when scaled
+            marginBottom: scale < 1 ? `${Math.round(1100 * (scale - 1))}px` : 0,
+          }}
+        >
+          {templateId === "modern-sidebar"
+            ? <ModernSidebarTemplate />
+            : <ATSProfessionalTemplate />
+          }
+        </div>
       </div>
     </div>
   );

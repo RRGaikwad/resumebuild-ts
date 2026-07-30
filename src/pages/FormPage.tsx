@@ -76,28 +76,40 @@ export function FormPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold text-center mb-8">Fill Your Resume</h1>
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg space-y-8">
+    <div className="w-full flex flex-col gap-[24px] md:gap-[32px] animate-in fade-in duration-500 pb-[32px]">
+      {/* Header */}
+      <div className="flex flex-col gap-1">
+        <h1 className="text-[28px] md:text-[40px] font-bold text-[#111827]">Resume Editor</h1>
+        <p className="text-[15px] text-[#6B7280]">Fill in your details to build your resume.</p>
+      </div>
+
+      {/* Form card */}
+      <div className="bg-white rounded-[20px] border border-[#E5E7EB] shadow-sm p-[16px] md:p-[32px] space-y-8">
         <ProfileForm />
         <ExperienceForm />
         <EducationForm />
         <SkillsForm />
         <LanguagesForm />
         <InterestsForm />
-        <div className="text-center">
+
+        {/* Submit */}
+        <div className="flex justify-end pt-4 border-t border-[#E5E7EB]">
           <button
             onClick={handleSubmit}
             disabled={isSaving}
-            className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center mx-auto gap-2"
+            className="premium-btn-primary min-w-[180px] justify-center"
           >
-            {isSaving && (
-              <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-              </svg>
+            {isSaving ? (
+              <>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+                Saving...
+              </>
+            ) : (
+              "Preview Resume →"
             )}
-            {isSaving ? "Saving..." : "Preview Resume"}
           </button>
         </div>
       </div>
