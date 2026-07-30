@@ -104,6 +104,7 @@
 - **NEVER use Tailwind CSS classes for layout inside resume templates** — use `style={{}}` inline styles so `html2canvas` can read computed values.
 - **NEVER use `format: "a4"` with `unit: "mm"` for PDF export** — this forces a fixed page size that distorts the resume. Always use `unit: "px"` with `format: [canvas.width/2, canvas.height/2]` so the PDF page matches the canvas exactly (identical to JPG output).
 - **Always test PDF + JPG export after any changes to a template component.**
+- **Mobile Responsive Forms**: Never force multiple columns on mobile inside form fields (e.g., use `grid-cols-1 sm:grid-cols-2` instead of `grid-cols-2`). Always add `min-w-0` to flex child containers and inputs to prevent overflow and overlap with action buttons (like remove "X"). Action buttons should use `shrink-0`.
 - **Template store data is a superset**: The `ResumeData` store holds fields for ALL templates. Individual templates only read the fields they need. New fields added for one template are ignored by others — this is by design and intentional.
 - **Skills use the `category` field** for the Modern Sidebar template's grouped skill bars. The `categorizedSkills` field is used by the ATS template. Both co-exist safely.
 
